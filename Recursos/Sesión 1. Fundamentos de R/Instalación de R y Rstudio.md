@@ -10,4 +10,4 @@
 
 Correr este código en la consola de R
 
-![](rtools path.png)
+![](rtools%20path.png)
