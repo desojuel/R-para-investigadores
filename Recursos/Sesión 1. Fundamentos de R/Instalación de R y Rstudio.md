@@ -10,4 +10,4 @@
 
 Correr este código en la consola de R
 
-![](Recursos/Sesión 1. Fundamentos de R/rtools path.png)
+![](<Recursos/Sesión 1. Fundamentos de R/rtools path.png>)
