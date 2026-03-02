@@ -1,7 +1,0 @@
----
-title: "Módulo 1: Fundamentos de R"
-format: revealjs
-editor: visual
----
-
-## Ejercicio de bienvenida
