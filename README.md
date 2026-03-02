@@ -13,8 +13,9 @@
 1. [Objects](https://rstudio-education.github.io/hopr/r-objects.html)
 
 
-### Recursos adiciona.es
+### Recursos adicionales
 
+1. [R4DS](https://es.r4ds.hadley.nz/)
 1. [Recetas de Posit](https://posit.cloud/learn/recipes)
 
 
