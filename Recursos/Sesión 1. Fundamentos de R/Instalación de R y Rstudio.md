@@ -10,6 +10,6 @@
 
 - Correr este código en la consola de R: 
 
-write('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"',
-      file = "~/.Renviron",
-      append = TRUE)
+  write('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"',
+        file = "~/.Renviron",
+        append = TRUE)
