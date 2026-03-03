@@ -4,10 +4,10 @@
 
 ### Sesión 1
 
-
+1. [Presentació Sesión 1](https://docs.google.com/presentation/d/1f8EFu8dOeLvHSIciPzvLXx6fMMuaGLY6NYjm4jBxHb4) 
 1. [Instalación de R y Rstudio](<Recursos/Sesión 1. Fundamentos de R/Instalación de R y Rstudio.md>)
-2. [Introducción a R y RStudio](https://rstudio-education.github.io/hopr/r-objects.html)
-3. [Lectura de datos en RStudio](<Recursos/Sesión 1. Fundamentos de R/Read files.R>)
+1. [Introducción a R y RStudio](https://rstudio-education.github.io/hopr/r-objects.html)
+1. [Lectura de datos en RStudio](<Recursos/Sesión 1. Fundamentos de R/Read files.R>)
 
 
 ### Recursos adicionales
