@@ -15,3 +15,7 @@ write('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"',
       file = "~/.Renviron",
       append = TRUE)
 ```
+
+## Tutorial
+
+[![Tutorial](https://img.youtube.com/vi/6CMEA0ml-dU/0.jpg)](https://www.youtube.com/watch?v=6CMEA0ml-dU)
