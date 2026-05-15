@@ -146,7 +146,7 @@ Ctrl + C  (en la terminal / consola de R)
 
 ```r
 # Proceso que tarda mucho
-x <- rnorm(1e10)   # Intentar generar 10 mil millones de números
+x <- rnorm(1e9)   # Intentar generar 10 mil millones de números
 
 # Si ves que tarda demasiado o se come toda la memoria:
 # → Esc o Ctrl + C para detenerlo
