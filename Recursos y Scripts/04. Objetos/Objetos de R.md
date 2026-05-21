@@ -2,32 +2,32 @@
 
 ## 1. ¿Qué es un objeto?
 
-Prácticamente todo lo que se crea en R es un objeto. Un número, un conjunto de datos, un resultado estadístico, un gráfico, una función: todos son objetos. Se puede pensar en un objeto como una caja con un nombre en la etiqueta y un contenido adentro. El nombre permite referirse al contenido más adelante sin tener que volver a escribirlo o calcularlo.
+Prácticamente todo lo que se crea en R es un objeto. Un número, un conjunto de datos, un resultado estadístico, un gráfico, una función: todos son objetos. Un objeto es simplemente un espacio en la memoria de la computadora al que se le asigna un nombre y un contenido. El nombre permite referirse al contenido más adelante sin tener que volver a escribirlo o calcularlo.
 
-Cuando se escribe una expresión en la consola, R la evalúa e imprime el resultado, pero ese resultado se pierde. La utilidad de los objetos es precisamente que permiten guardar resultados para usarlos después.
+Cuando se escribe una expresión en la consola, R la evalúa e imprime el resultado, pero ese resultado se pierde inmediatamente. La utilidad de los objetos es precisamente que permiten guardar resultados para reutilizarlos después.
 
 ```r
-# Esto calcula la raíz cuadrada de 100, pero el resultado se pierde
-sqrt(100)
-## [1] 10
+# Esto calcula el logaritmo natural de 50, pero el resultado se pierde
+log(50)
+## [1] 3.912023
 
 # Esto guarda el resultado en un objeto llamado "resultado"
-resultado <- sqrt(100)
+resultado <- log(50)
 
 # Ahora se puede usar ese objeto en cualquier momento
 resultado
-## [1] 10
+## [1] 3.912023
 ```
 
 Un objeto tiene al menos dos propiedades fundamentales: un **nombre** y un **valor**. Pero además, dependiendo del tipo de objeto, puede tener otras propiedades como su modo (el tipo de dato que contiene), su longitud, sus dimensiones, sus nombres de fila o columna, entre otras. La función `str()` es una de las más útiles para examinar la estructura de cualquier objeto.
 
 ```r
-x <- c(4, 67, 23, 4, 10, 35)
-str(x)
-##  num [1:6] 4 67 23 4 10 35
+temperaturas <- c(18.5, 22.3, 19.1, 25.0, 21.7)
+str(temperaturas)
+##  num [1:5] 18.5 22.3 19.1 25 21.7
 ```
 
-La salida de `str()` indica que `x` es un vector numérico (`num`) con 6 elementos (`[1:6]`), y muestra los valores.
+La salida de `str()` indica que `temperaturas` es un vector numérico (`num`) con 5 elementos (`[1:5]`), y muestra los valores.
 
 ---
 
@@ -42,8 +42,8 @@ nombre <- valor
 Esto significa: "el objeto `nombre` recibe `valor`".
 
 ```r
-x <- 5
-mi_texto <- "Hola mundo"
+n_participantes <- 120
+saludo <- "Buenos días"
 ```
 
 Aunque R también permite usar `=` para asignar, la convención en la comunidad de R es usar `<-` porque hace explícita la dirección de la asignación: el nombre está a la izquierda y el valor a la derecha. En RStudio, el atajo de teclado **Alt + -** (guion) inserta `<-` automáticamente.
@@ -68,14 +68,14 @@ Los nombres de objetos deben cumplir ciertas reglas:
 
 ```r
 # Nombres válidos
-edad <- 32
-grupo.control <- c(5, 8, 12)
-total_2024 <- 1500
+altura <- 1.72
+grupo.experimental <- c(12, 15, 9)
+ingreso_2023 <- 45000
 
 # Nombres NO válidos
-# 1edad <- 32          # comienza con número
-# mi variable <- 32   # contiene espacio
-# total! <- 32        # contiene carácter especial
+# 1altura <- 1.72          # comienza con número
+# mi ingreso <- 45000     # contiene espacio
+# resultado! <- 100       # contiene carácter especial
 ```
 
 ### Sobrescritura de objetos
@@ -83,13 +83,13 @@ total_2024 <- 1500
 Si se asigna un nuevo valor a un nombre que ya existe, R reemplaza el valor anterior sin avisar.
 
 ```r
-x <- 10
-x
-## [1] 10
+precio <- 50
+precio
+## [1] 50
 
-x <- 99
-x
-## [1] 99
+precio <- 75
+precio
+## [1] 75
 ```
 
 Esto es algo que requiere atención, porque no hay advertencia ni confirmación.
@@ -99,20 +99,20 @@ Esto es algo que requiere atención, porque no hay advertencia ni confirmación.
 Un punto que suele causar confusión: realizar una operación con un objeto no cambia el objeto a menos que se reasigne el resultado.
 
 ```r
-z <- 0
-z + 1
-## [1] 1
+contador <- 10
+contador + 5
+## [1] 15
 
-z
-## [1] 0    # z sigue siendo 0, porque no se reasignó
+contador
+## [1] 10    # contador sigue siendo 10, porque no se reasignó
 ```
 
 Para que el cambio se conserve:
 
 ```r
-z <- z + 1
-z
-## [1] 1
+contador <- contador + 5
+contador
+## [1] 15
 ```
 
 ---
@@ -122,16 +122,16 @@ z
 R distingue entre mayúsculas y minúsculas. Esto significa que `x`, `X`, `miDato`, `MiDato` y `MIDATO` son todos objetos completamente diferentes.
 
 ```r
-edad <- 25
-Edad <- 30
-EDAD <- 35
+pais <- "Guatemala"
+Pais <- "México"
+PAIS <- "Colombia"
 
-edad
-## [1] 25
-Edad
-## [1] 30
-EDAD
-## [1] 35
+pais
+## [1] "Guatemala"
+Pais
+## [1] "México"
+PAIS
+## [1] "Colombia"
 ```
 
 Esto aplica tanto a nombres de objetos como a nombres de funciones. Si una función se llama `data.frame()`, escribir `Data.Frame()` o `data.Frame()` producirá un error. Si se obtiene un error inesperado, una de las primeras cosas que conviene verificar es que los nombres estén escritos exactamente como deben estar.
@@ -151,13 +151,13 @@ Los tipos de datos más comunes son:
 | `logical` | Valores lógicos | `TRUE`, `FALSE` |
 
 ```r
-mode(42)
+mode(7.5)
 ## [1] "numeric"
 
-mode("hola")
+mode("Guatemala")
 ## [1] "character"
 
-mode(TRUE)
+mode(FALSE)
 ## [1] "logical"
 ```
 
@@ -168,10 +168,10 @@ Hay otros modos como `integer` (enteros explícitos), `complex` (números comple
 Porque determinan qué operaciones se pueden realizar. No se puede calcular la media de texto, ni concatenar números como si fueran cadenas de caracteres sin antes convertirlos.
 
 ```r
-mean(c(1, 10))
-## [1] 5.5
+mean(c(20, 30))
+## [1] 25
 
-mean(c("1", "10"))
+mean(c("20", "30"))
 ## Warning: argument is not numeric or logical, returning NA
 ```
 
@@ -183,8 +183,8 @@ R tiene funciones de la forma `as.tipo()` para convertir un objeto de un tipo a 
 as.numeric(TRUE)
 ## [1] 1
 
-as.character(42)
-## [1] "42"
+as.character(150)
+## [1] "150"
 
 as.logical(0)
 ## [1] FALSE
@@ -193,7 +193,7 @@ as.logical(0)
 Hay que tener cuidado: si la conversión no tiene sentido, R produce valores `NA` (datos faltantes) con una advertencia.
 
 ```r
-as.numeric("perro")
+as.numeric("café")
 ## Warning: NAs introduced by coercion
 ## [1] NA
 ```
@@ -203,11 +203,11 @@ as.numeric("perro")
 Un vector solo puede contener un tipo de dato. Si se mezclan tipos, R convierte todo al tipo más general, siguiendo la jerarquía: `logical` → `numeric` → `character`.
 
 ```r
-c("a", 1, TRUE)
-## [1] "a"    "1"    "TRUE"    # Todo se convirtió a character
+c("rojo", 5, TRUE)
+## [1] "rojo" "5"    "TRUE"    # Todo se convirtió a character
 
-c(FALSE, 10, TRUE)
-## [1]  0 10  1               # Los lógicos se convirtieron a numéricos
+c(TRUE, 42, FALSE)
+## [1]  1 42  0               # Los lógicos se convirtieron a numéricos
 ```
 
 ---
@@ -230,8 +230,8 @@ Los objetos atómicos en R son:
 Todos estos comparten una propiedad: no se puede poner un vector dentro de otro vector. Si se intenta, R simplemente aplana todo en una sola secuencia:
 
 ```r
-c(c(1, 2), c(3, 4))
-## [1] 1 2 3 4
+c(c(10, 20), c(30, 40))
+## [1] 10 20 30 40
 ```
 
 No se obtuvo un vector que contiene dos vectores, sino un solo vector de cuatro elementos. Esto es lo que significa ser atómico: los elementos no tienen estructura interna.
@@ -239,16 +239,16 @@ No se obtuvo un vector que contiene dos vectores, sino un solo vector de cuatro 
 Se puede verificar si un objeto es atómico con `is.atomic()`:
 
 ```r
-x <- c(10, 20, 30)
-is.atomic(x)
+notas <- c(85, 92, 78)
+is.atomic(notas)
 ## [1] TRUE
 
 m <- matrix(1:6, nrow = 2)
 is.atomic(m)
 ## [1] TRUE
 
-f <- factor(c("a", "b", "a"))
-is.atomic(f)
+region <- factor(c("norte", "sur", "norte"))
+is.atomic(region)
 ## [1] TRUE
 ```
 
@@ -263,22 +263,22 @@ Los objetos recursivos en R son:
 - **Tibbles** (que heredan de data frame)
 
 ```r
-mi_lista <- list(
-  numeros = c(1, 2, 3),
-  otra_lista = list(a = "hola", b = TRUE)
+registro <- list(
+  valores = c(5, 10, 15),
+  info = list(fuente = "encuesta", fecha = "2025-03")
 )
 
-is.atomic(mi_lista)
+is.atomic(registro)
 ## [1] FALSE
 
-is.recursive(mi_lista)
+is.recursive(registro)
 ## [1] TRUE
 ```
 
 Un data frame es recursivo porque internamente es una lista de vectores:
 
 ```r
-df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+df <- data.frame(ciudad = c("Lima", "Bogotá"), poblacion = c(10, 8))
 
 is.atomic(df)
 ## [1] FALSE
@@ -295,30 +295,30 @@ Porque aclara comportamientos de R que de otro modo parecen arbitrarios. Dos eje
 
 ```r
 # Atómico: se aplana
-c(c(1, 2), c(3, 4))
-## [1] 1 2 3 4
+c(c(10, 20), c(30, 40))
+## [1] 10 20 30 40
 
 # Recursivo: se concatena
-c(list(a = 1), list(b = 2))
-## $a
-## [1] 1
+c(list(ciudad = "Lima"), list(pais = "Perú"))
+## $ciudad
+## [1] "Lima"
 ##
-## $b
-## [1] 2
+## $pais
+## [1] "Perú"
 ```
 
 **Segundo ejemplo: `is.vector()` no pregunta lo que parece.** La función `is.vector()` no pregunta "¿es esto un vector?" en el sentido coloquial. Pregunta algo más estricto: "¿es esto un vector atómico que no tiene atributos más allá de `names`?". Por eso un factor devuelve `FALSE` aunque sea una secuencia de datos, y un data frame también devuelve `FALSE`:
 
 ```r
-x <- c(1, 2, 3)
+x <- c(5, 10, 15)
 is.vector(x)
 ## [1] TRUE
 
-f <- factor(c("a", "b"))
-is.vector(f)
+region <- factor(c("norte", "sur"))
+is.vector(region)
 ## [1] FALSE       # Tiene atributos extra (class, levels)
 
-is.atomic(f)
+is.atomic(region)
 ## [1] TRUE        # Pero sí es atómico
 ```
 
@@ -354,13 +354,13 @@ El vector es el tipo de objeto más básico y fundamental en R. Es una secuencia
 
 ```r
 # Un escalar es un vector de longitud 1
-x <- 5
-length(x)
+temperatura <- 22.5
+length(temperatura)
 ## [1] 1
 
 # Un vector con múltiples elementos
-edades <- c(25, 30, 22, 41)
-nombres <- c("Ana", "Luis", "Carla", "Pedro")
+lluvias_mm <- c(120, 85, 200, 45, 310)
+ciudades <- c("Lima", "Bogotá", "Quito", "Santiago")
 ```
 
 La función `c()` (de *concatenar* o *combinar*) es la forma más directa de crear un vector. Existen otras formas útiles:
@@ -375,37 +375,37 @@ seq(from = 0, to = 1, by = 0.25)
 ## [1] 0.00 0.25 0.50 0.75 1.00
 
 # Repetición
-rep("A", times = 4)
-## [1] "A" "A" "A" "A"
+rep("control", times = 4)
+## [1] "control" "control" "control" "control"
 ```
 
 Los vectores tienen una propiedad importante: su **longitud**, que se obtiene con `length()`.
 
 ```r
-length(edades)
-## [1] 4
+length(lluvias_mm)
+## [1] 5
 ```
 
 Para acceder a elementos específicos de un vector, se usan corchetes `[ ]` con el índice de la posición deseada:
 
 ```r
-edades[1]       # Primer elemento
-## [1] 25
+lluvias_mm[1]       # Primer elemento
+## [1] 120
 
-edades[c(1, 3)] # Primero y tercero
-## [1] 25 22
+lluvias_mm[c(2, 4)] # Segundo y cuarto
+## [1] 85 45
 
-edades[-2]      # Todos menos el segundo
-## [1] 25 22 41
+lluvias_mm[-3]      # Todos menos el tercero
+## [1] 120  85  45 310
 ```
 
 Los elementos de un vector pueden tener nombres:
 
 ```r
-zapato <- c(marca = "Nike", talla = "10", modelo = "Pegasus")
-zapato["marca"]
-## marca
-## "Nike"
+cafe <- c(tipo = "arábica", origen = "Antigua", altitud_m = "1500")
+cafe["origen"]
+## origen
+## "Antigua"
 ```
 
 ### 6.2. Matrices
@@ -413,12 +413,13 @@ zapato["marca"]
 Una matriz es un vector con dos dimensiones: filas y columnas. Al igual que los vectores, una matriz solo puede contener un tipo de dato.
 
 ```r
-mi_matriz <- matrix(data = 1:12, nrow = 3, ncol = 4)
-mi_matriz
-##      [,1] [,2] [,3] [,4]
-## [1,]    1    4    7   10
-## [2,]    2    5    8   11
-## [3,]    3    6    9   12
+ventas <- matrix(data = c(150, 200, 180, 220, 170, 250),
+                 nrow = 3, ncol = 2)
+ventas
+##      [,1] [,2]
+## [1,]  150  220
+## [2,]  200  170
+## [3,]  180  250
 ```
 
 Por defecto, `matrix()` llena los datos por columna. Si se desea llenar por fila, se usa `byrow = TRUE`.
@@ -426,26 +427,26 @@ Por defecto, `matrix()` llena los datos por columna. Si se desea llenar por fila
 También se pueden crear matrices combinando vectores con `cbind()` (unir como columnas) o `rbind()` (unir como filas):
 
 ```r
-x <- 1:3
-y <- 4:6
-cbind(x, y)
-##      x y
-## [1,] 1 4
-## [2,] 2 5
-## [3,] 3 6
+enero <- c(30, 28, 35)
+febrero <- c(25, 22, 30)
+cbind(enero, febrero)
+##      enero febrero
+## [1,]    30      25
+## [2,]    28      22
+## [3,]    35      30
 ```
 
 Para acceder a elementos de una matriz se usan dos índices separados por coma: `[fila, columna]`. Si se omite uno de los dos, se obtienen todas las filas o todas las columnas.
 
 ```r
-mi_matriz[2, 3]    # Fila 2, columna 3
-## [1] 8
+ventas[2, 1]    # Fila 2, columna 1
+## [1] 200
 
-mi_matriz[1, ]     # Fila 1, todas las columnas
-## [1]  1  4  7 10
+ventas[1, ]     # Fila 1, todas las columnas
+## [1] 150 220
 
-mi_matriz[, 2]     # Todas las filas, columna 2
-## [1] 4 5 6
+ventas[, 2]     # Todas las filas, columna 2
+## [1] 220 170 250
 ```
 
 Las funciones `nrow()`, `ncol()` y `dim()` permiten consultar las dimensiones de una matriz.
@@ -455,50 +456,50 @@ Las funciones `nrow()`, `ncol()` y `dim()` permiten consultar las dimensiones de
 Un array es una generalización de la matriz a más de dos dimensiones. Se puede pensar como un cubo (o hipercubo) de datos.
 
 ```r
-mi_array <- array(
+inventario <- array(
   data = 1:24,
-  dim = c(3, 4, 2),
+  dim = c(4, 3, 2),
   dimnames = list(
-    fila = c("f1", "f2", "f3"),
-    columna = c("c1", "c2", "c3", "c4"),
-    capa = c("capa1", "capa2")
+    trimestre = paste0("Q", 1:4),
+    producto = c("café", "té", "chocolate"),
+    año = c("2024", "2025")
   )
 )
 ```
 
-Esto crea un array de 3 filas × 4 columnas × 2 capas. Para acceder a elementos, se necesitan tres índices:
+Esto crea un array de 4 trimestres × 3 productos × 2 años. Para acceder a elementos, se necesitan tres índices:
 
 ```r
-mi_array["f1", "c2", "capa1"]  # Por nombre
-mi_array[1, 2, 1]              # Por posición
+inventario["Q1", "café", "2025"]  # Por nombre
+inventario[1, 1, 2]               # Por posición
 ```
 
 Al igual que los vectores y las matrices, los arrays solo pueden contener un tipo de dato.
 
 ### 6.4. Listas
 
-Una lista es una colección de objetos que pueden ser de distintos tipos y distintas longitudes. Si un vector es una caja que contiene elementos del mismo tipo, una lista es un carrito de supermercado que puede contener cajas de todo tipo: vectores, matrices, otras listas, funciones, etc.
+Una lista es una colección de objetos que pueden ser de distintos tipos y distintas longitudes. Si un vector es un contenedor con compartimentos iguales, una lista es un archivador con cajones de distintos tamaños, donde cada cajón puede guardar cualquier cosa: vectores, matrices, otras listas, funciones, etc.
 
 ```r
-mi_lista <- list(
-  numeros = c(1, 2, 3),
-  texto = "hola",
-  matriz = matrix(1:4, nrow = 2)
+experimento <- list(
+  participantes = 45,
+  grupos = c("control", "tratamiento"),
+  resultados = matrix(c(82, 91, 78, 88), nrow = 2)
 )
 
-str(mi_lista)
+str(experimento)
 ## List of 3
-##  $ numeros: num [1:3] 1 2 3
-##  $ texto  : chr "hola"
-##  $ matriz : int [1:2, 1:2] 1 2 3 4
+##  $ participantes: num 45
+##  $ grupos       : chr [1:2] "control" "tratamiento"
+##  $ resultados   : num [1:2, 1:2] 82 91 78 88
 ```
 
 Para acceder a los elementos de una lista se usan dobles corchetes `[[ ]]` o el operador `$`:
 
 ```r
-mi_lista[[1]]         # Primer elemento (el vector numérico)
-mi_lista$texto        # Elemento llamado "texto"
-mi_lista[["matriz"]]  # Elemento llamado "matriz"
+experimento[[1]]            # Primer elemento (el número 45)
+experimento$grupos          # Elemento llamado "grupos"
+experimento[["resultados"]] # Elemento llamado "resultados"
 ```
 
 Las listas son importantes porque muchas funciones de R devuelven sus resultados como listas. Por ejemplo, cuando se ejecuta una prueba estadística, el resultado es un objeto tipo lista que contiene el estadístico de prueba, el valor p, los intervalos de confianza, etc.
@@ -508,20 +509,19 @@ Las listas son importantes porque muchas funciones de R devuelven sus resultados
 Un data frame es el tipo de objeto más utilizado para almacenar datos tabulares. Es técnicamente una lista de vectores de la misma longitud, donde cada vector representa una columna (variable) del conjunto de datos. A diferencia de una matriz, un data frame puede contener columnas de distintos tipos.
 
 ```r
-encuesta <- data.frame(
-  id = 1:5,
-  sexo = c("m", "m", "f", "f", "m"),
-  edad = c(24, 25, 42, 56, 22),
+cafeteria <- data.frame(
+  bebida = c("espresso", "latte", "americano", "mocha"),
+  precio = c(15, 25, 18, 30),
+  disponible = c(TRUE, TRUE, FALSE, TRUE),
   stringsAsFactors = FALSE
 )
 
-encuesta
-##   id sexo edad
-## 1  1    m   24
-## 2  2    m   25
-## 3  3    f   42
-## 4  4    f   56
-## 5  5    m   22
+cafeteria
+##      bebida precio disponible
+## 1  espresso     15       TRUE
+## 2     latte     25       TRUE
+## 3 americano     18      FALSE
+## 4     mocha     30       TRUE
 ```
 
 El argumento `stringsAsFactors = FALSE` evita que R convierta automáticamente las columnas de texto en factores, lo cual puede causar comportamientos inesperados.
@@ -529,38 +529,38 @@ El argumento `stringsAsFactors = FALSE` evita que R convierta automáticamente l
 Para acceder a una columna se usa el operador `$`:
 
 ```r
-encuesta$edad
-## [1] 24 25 42 56 22
+cafeteria$precio
+## [1] 15 25 18 30
 
-mean(encuesta$edad)
-## [1] 33.8
+mean(cafeteria$precio)
+## [1] 22
 ```
 
 Las funciones más útiles para explorar un data frame son:
 
 ```r
-head(encuesta)       # Primeras filas
-str(encuesta)        # Estructura
-names(encuesta)      # Nombres de las columnas
-nrow(encuesta)       # Número de filas
-ncol(encuesta)       # Número de columnas
-summary(encuesta)    # Resumen estadístico
+head(cafeteria)       # Primeras filas
+str(cafeteria)        # Estructura
+names(cafeteria)      # Nombres de las columnas
+nrow(cafeteria)       # Número de filas
+ncol(cafeteria)       # Número de columnas
+summary(cafeteria)    # Resumen estadístico
 ```
 
 Se pueden agregar nuevas columnas con facilidad:
 
 ```r
-encuesta$grupo <- c("A", "B", "A", "B", "A")
+cafeteria$tamaño <- c("S", "M", "M", "L")
 ```
 
 Y se puede filtrar el data frame usando indexación lógica o la función `subset()`:
 
 ```r
-# Solo participantes mayores de 30
-encuesta[encuesta$edad > 30, ]
+# Solo bebidas con precio mayor a 20
+cafeteria[cafeteria$precio > 20, ]
 
 # Equivalente con subset()
-subset(encuesta, edad > 30)
+subset(cafeteria, precio > 20)
 ```
 
 ### 6.6. Funciones
@@ -568,14 +568,14 @@ subset(encuesta, edad > 30)
 Las funciones también son objetos en R. Esto significa que se pueden asignar a un nombre, pasar como argumento a otras funciones e incluso almacenar dentro de listas.
 
 ```r
-mi_funcion <- function(x) {
-  x * 2
+convertir_km <- function(millas) {
+  millas * 1.60934
 }
 
-mi_funcion(5)
-## [1] 10
+convertir_km(10)
+## [1] 16.0934
 
-mode(mi_funcion)
+mode(convertir_km)
 ## [1] "function"
 ```
 
@@ -586,13 +586,13 @@ Aunque la creación de funciones se trata en detalle en temas posteriores, es im
 Un factor es un tipo de objeto diseñado para representar variables categóricas, es decir, variables que solo pueden tomar un conjunto finito de valores (llamados **niveles**). Internamente, R almacena los factores como números enteros, pero los muestra con sus etiquetas.
 
 ```r
-colores <- factor(c("rojo", "azul", "rojo", "verde", "azul"))
-colores
-## [1] rojo  azul  rojo  verde azul
-## Levels: azul rojo verde
+estaciones <- factor(c("verano", "invierno", "verano", "otoño", "invierno"))
+estaciones
+## [1] verano   invierno verano   otoño    invierno
+## Levels: invierno otoño verano
 
-str(colores)
-##  Factor w/ 3 levels "azul","rojo",..: 2 1 2 3 1
+str(estaciones)
+##  Factor w/ 3 levels "invierno","otoño",..: 3 1 3 2 1
 ```
 
 Los factores son relevantes para análisis estadísticos (ANOVA, regresiones con variables categóricas) y para controlar el orden de las categorías en gráficos. Sin embargo, pueden causar problemas cuando se confunden con caracteres, por lo que es importante saber distinguirlos.
@@ -603,12 +603,14 @@ Los factores son relevantes para análisis estadísticos (ANOVA, regresiones con
 
 ### Vectores
 
-Son el objeto más utilizado. Representan cualquier serie de datos de un solo tipo: una columna de edades, una lista de nombres, una secuencia de respuestas verdadero/falso. Las operaciones aritméticas y lógicas se aplican elemento por elemento de forma automática (lo que R llama **vectorización**), lo que los hace extremadamente eficientes.
+Son el objeto más utilizado. Representan cualquier serie de datos de un solo tipo: una columna de edades, una serie de mediciones, una secuencia de respuestas verdadero/falso. Las operaciones aritméticas y lógicas se aplican elemento por elemento de forma automática (lo que R llama **vectorización**), lo que los hace extremadamente eficientes.
 
 ```r
-precios <- c(100, 200, 150, 300)
-precios * 1.12   # Aplicar IVA a todos los precios de una vez
-## [1] 112.0 224.0 168.0 336.0
+precios_usd <- c(12, 8.5, 15, 22)
+tipo_cambio <- 7.85
+precios_gtq <- precios_usd * tipo_cambio
+precios_gtq
+## [1]  94.20  66.73 117.75 172.70
 ```
 
 Todo en R se construye sobre vectores. Una matriz es un vector con dimensiones. Una columna de un data frame es un vector. Entender vectores es entender la base de R.
@@ -618,11 +620,13 @@ Todo en R se construye sobre vectores. Una matriz es un vector con dimensiones. 
 Se usan cuando una variable tiene un número finito de categorías y ese carácter categórico importa para el análisis. Son esenciales para análisis estadísticos como ANOVA o regresión con variables categóricas, y para controlar el orden de las categorías en gráficos (por ejemplo, que "Bajo" aparezca antes que "Medio" y "Alto", no en orden alfabético).
 
 ```r
-nivel <- factor(c("Alto", "Bajo", "Medio", "Alto"),
-                levels = c("Bajo", "Medio", "Alto"))
-nivel
-## [1] Alto  Bajo  Medio Alto
-## Levels: Bajo Medio Alto
+satisfaccion <- factor(
+  c("alta", "baja", "media", "alta"),
+  levels = c("baja", "media", "alta")
+)
+satisfaccion
+## [1] alta  baja  media alta
+## Levels: baja media alta
 ```
 
 Si los datos son puramente texto y no se necesitan niveles fijos, un vector de caracteres es suficiente. Los factores agregan valor cuando el análisis o la visualización requieren que R trate los datos como categorías.
@@ -632,27 +636,34 @@ Si los datos son puramente texto y no se necesitan niveles fijos, un vector de c
 Se usan principalmente en álgebra lineal y en cálculos que requieren operaciones matemáticas sobre tablas numéricas homogéneas: multiplicación de matrices, transposiciones, descomposiciones, correlaciones. Muchos modelos estadísticos internamente trabajan con matrices.
 
 ```r
-# Matriz de correlación
-datos <- matrix(c(1, 0.8, 0.8, 1), nrow = 2,
-                dimnames = list(c("X", "Y"), c("X", "Y")))
-datos
-##     X   Y
-## X 1.0 0.8
-## Y 0.8 1.0
+# Matriz de distancias (en km) entre tres ciudades
+distancias <- matrix(
+  c(0, 330, 470, 330, 0, 580, 470, 580, 0),
+  nrow = 3,
+  dimnames = list(
+    c("Guatemala", "SanSalvador", "Tegucigalpa"),
+    c("Guatemala", "SanSalvador", "Tegucigalpa")
+  )
+)
+distancias
+##             Guatemala SanSalvador Tegucigalpa
+## Guatemala           0         330         470
+## SanSalvador       330           0         580
+## Tegucigalpa       470         580           0
 ```
 
-También son útiles cuando los datos son una grilla numérica pura (como una tabla de distancias entre ciudades, o los píxeles de una imagen en escala de grises). Si los datos tienen columnas de distintos tipos, lo que se necesita es un data frame.
+También son útiles cuando los datos son una grilla numérica pura (como una tabla de distancias, una imagen en escala de grises o una matriz de covarianza). Si los datos tienen columnas de distintos tipos, lo que se necesita es un data frame.
 
 ### Data frames
 
 Es el formato estándar para almacenar datos tabulares en R, equivalente a una hoja de cálculo. Cada columna puede ser de un tipo diferente (números, texto, lógicos, factores), lo cual los hace ideales para prácticamente cualquier conjunto de datos del mundo real: encuestas, registros médicos, datos experimentales, datos económicos.
 
 ```r
-pacientes <- data.frame(
+estudiantes <- data.frame(
   id = 1:4,
-  nombre = c("Ana", "Luis", "Carla", "Pedro"),
-  edad = c(34, 28, 45, 52),
-  fumador = c(FALSE, TRUE, FALSE, TRUE),
+  nombre = c("María", "José", "Lucía", "Carlos"),
+  nota_final = c(88, 72, 95, 61),
+  aprobado = c(TRUE, TRUE, TRUE, FALSE),
   stringsAsFactors = FALSE
 )
 ```
@@ -664,38 +675,38 @@ La mayoría de las funciones de importación de datos (`read.csv()`, `read.table
 Las listas son el contenedor más flexible de R. Se usan cuando se necesita agrupar objetos heterogéneos que no encajan en una tabla rectangular. El caso de uso más importante es que **la mayoría de las funciones estadísticas devuelven listas**:
 
 ```r
-resultado <- t.test(c(5, 8, 6, 7), mu = 5)
-class(resultado)
+muestra_a <- c(23, 27, 25, 22, 28)
+muestra_b <- c(30, 35, 32, 29, 33)
+prueba <- t.test(muestra_a, muestra_b)
+class(prueba)
 ## [1] "htest"
 
-str(resultado)
-# Contiene: estadístico t, valor p, intervalo de confianza,
-# media muestral, hipótesis, etc.
-
-resultado$p.value
-## [1] 0.05797
+# El resultado contiene múltiples piezas de información
+prueba$p.value
+prueba$conf.int
+prueba$estimate
 ```
 
-Otros usos comunes incluyen almacenar resultados de simulaciones, agrupar múltiples data frames o matrices relacionados, y construir estructuras de datos complejas.
+Otros usos comunes incluyen almacenar configuraciones de un modelo, agrupar múltiples tablas de datos relacionadas, o guardar los resultados de una simulación donde cada iteración produce objetos de distinto tipo.
 
 ### Arrays
 
-Los arrays son la generalización de las matrices a más de dos dimensiones. En la práctica cotidiana de análisis de datos son menos frecuentes, pero aparecen en contextos donde los datos tienen una estructura tridimensional (o superior) natural. Por ejemplo, datos demográficos organizados por año × grupo de edad × sexo, o imágenes a color (alto × ancho × canal RGB), o resultados de simulaciones repetidas con múltiples parámetros.
+Los arrays son la generalización de las matrices a más de dos dimensiones. En la práctica cotidiana de análisis de datos son menos frecuentes, pero aparecen en contextos donde los datos tienen una estructura tridimensional (o superior) natural. Por ejemplo, datos de ventas organizados por mes × producto × sucursal, mediciones climáticas por estación × variable × año, o imágenes a color representadas como alto × ancho × canal RGB.
 
 ```r
-# Datos de ventas: 4 trimestres × 3 productos × 2 años
-ventas <- array(
-  data = sample(100:500, 24),
-  dim = c(4, 3, 2),
+# Mediciones de temperatura: 3 meses × 2 estaciones × 2 años
+clima <- array(
+  data = c(18, 22, 25, 15, 19, 23, 20, 24, 27, 17, 21, 25),
+  dim = c(3, 2, 2),
   dimnames = list(
-    trimestre = paste0("Q", 1:4),
-    producto = c("A", "B", "C"),
-    anio = c("2024", "2025")
+    mes = c("enero", "febrero", "marzo"),
+    estacion = c("central", "norte"),
+    año = c("2024", "2025")
   )
 )
 
-# Ventas del producto B en 2025
-ventas[, "B", "2025"]
+# Temperatura de febrero en la estación norte, 2025
+clima["febrero", "norte", "2025"]
 ```
 
 Si los datos pueden organizarse bien en una tabla de dos dimensiones, una matriz o un data frame son preferibles por ser más simples de manipular.
@@ -711,11 +722,11 @@ Estos tipos de objetos pueden parecer similares porque todos muestran datos orga
 Es un vector con dimensiones. Solo puede contener **un tipo de dato** (generalmente numérico). No tiene concepto de "variables" o "observaciones"; simplemente es una grilla de valores. Se usa para operaciones matemáticas.
 
 ```r
-m <- matrix(1:6, nrow = 2, ncol = 3)
+m <- matrix(c(10, 20, 30, 40, 50, 60), nrow = 2, ncol = 3)
 m
 ##      [,1] [,2] [,3]
-## [1,]    1    3    5
-## [2,]    2    4    6
+## [1,]   10   30   50
+## [2,]   20   40   60
 
 class(m)
 ## [1] "matrix" "array"
@@ -726,11 +737,14 @@ class(m)
 Es una lista de vectores de la misma longitud. Cada columna puede ser de un **tipo diferente**. Tiene nombres de columnas (variables) y nombres de filas (observaciones). Es el formato estándar para datos estadísticos en R base.
 
 ```r
-df <- data.frame(nombre = c("Ana", "Luis"), edad = c(30, 25))
+df <- data.frame(
+  municipio = c("Mixco", "Villa Nueva"),
+  poblacion_miles = c(500, 600)
+)
 df
-##   nombre edad
-## 1    Ana   30
-## 2   Luis   25
+##     municipio poblacion_miles
+## 1       Mixco             500
+## 2 Villa Nueva             600
 
 class(df)
 ## [1] "data.frame"
@@ -743,13 +757,16 @@ Un tibble es una versión moderna del data frame, introducida por el paquete `ti
 ```r
 library(tibble)
 
-tb <- tibble(nombre = c("Ana", "Luis"), edad = c(30, 25))
+tb <- tibble(
+  municipio = c("Mixco", "Villa Nueva"),
+  poblacion_miles = c(500, 600)
+)
 tb
 ## # A tibble: 2 × 2
-##   nombre  edad
-##   <chr>  <dbl>
-## 1 Ana       30
-## 2 Luis      25
+##   municipio   poblacion_miles
+##   <chr>                 <dbl>
+## 1 Mixco                   500
+## 2 Villa Nueva             600
 
 class(tb)
 ## [1] "tbl_df"     "tbl"        "data.frame"
@@ -764,20 +781,20 @@ Las diferencias principales con un data frame clásico son:
 
 ```r
 # Con data frame, una sola columna devuelve un vector
-df[, "edad"]
-## [1] 30 25
+df[, "poblacion_miles"]
+## [1] 500 600
 
 # Con tibble, una sola columna devuelve otro tibble
-tb[, "edad"]
+tb[, "poblacion_miles"]
 ## # A tibble: 2 × 1
-##    edad
-##   <dbl>
-## 1    30
-## 2    25
+##   poblacion_miles
+##             <dbl>
+## 1             500
+## 2             600
 
 # Para obtener un vector desde un tibble, se usa $ o [[
-tb$edad
-## [1] 30 25
+tb$poblacion_miles
+## [1] 500 600
 ```
 
 En la práctica, quien trabaja con tidyverse trabaja con tibbles todo el tiempo (las funciones `read_csv()`, `select()`, `filter()`, `mutate()` y demás devuelven tibbles). Quien trabaja con R base trabaja con data frames. Ambos son compatibles entre sí: casi cualquier función que acepta un data frame acepta un tibble, y se puede convertir entre ellos con `as_tibble()` y `as.data.frame()`.
@@ -787,14 +804,14 @@ En la práctica, quien trabaja con tidyverse trabaja con tibbles todo el tiempo 
 Una tabla es el resultado de la función `table()`, que cuenta frecuencias. Es un tipo de array especializado en conteos. No se usa para almacenar datos crudos, sino para resumir datos categóricos.
 
 ```r
-colores <- c("rojo", "azul", "rojo", "verde", "azul", "rojo")
-t <- table(colores)
-t
-## colores
-##  azul  rojo verde
-##     2     3     1
+transporte <- c("bus", "carro", "bus", "moto", "carro", "bus")
+conteo <- table(transporte)
+conteo
+## transporte
+##   bus carro  moto
+##     3     2     1
 
-class(t)
+class(conteo)
 ## [1] "table"
 ```
 
@@ -815,11 +832,11 @@ class(t)
 Un error frecuente es confundir una tabla de frecuencias (resultado de `table()`) con un data frame. Si se necesita manipular una tabla como si fuera un data frame, se puede convertir con `as.data.frame()`:
 
 ```r
-as.data.frame(t)
-##   colores Freq
-## 1    azul    2
-## 2    rojo    3
-## 3   verde    1
+as.data.frame(conteo)
+##   transporte Freq
+## 1        bus    3
+## 2      carro    2
+## 3       moto    1
 ```
 
 De la misma forma, si se trabaja en tidyverse y se recibe un data frame clásico, se puede convertir con `as_tibble()`:
@@ -827,10 +844,10 @@ De la misma forma, si se trabaja en tidyverse y se recibe un data frame clásico
 ```r
 as_tibble(df)
 ## # A tibble: 2 × 2
-##   nombre  edad
-##   <chr>  <dbl>
-## 1 Ana       30
-## 2 Luis      25
+##   municipio   poblacion_miles
+##   <chr>                 <dbl>
+## 1 Mixco                   500
+## 2 Villa Nueva             600
 ```
 
 ---
@@ -839,7 +856,7 @@ as_tibble(df)
 
 | Tipo | Dimensiones | Tipos de dato | Ejemplo de creación |
 |------|-------------|---------------|---------------------|
-| Vector | 1 | Un solo tipo | `c(1, 2, 3)` |
+| Vector | 1 | Un solo tipo | `c(10, 20, 30)` |
 | Matriz | 2 (filas × columnas) | Un solo tipo | `matrix(1:6, nrow=2)` |
 | Array | n (n dimensiones) | Un solo tipo | `array(1:24, dim=c(3,4,2))` |
 | Lista | 1 (jerárquica) | Mixtos | `list(a=1, b="hola")` |
@@ -857,12 +874,12 @@ as_tibble(df)
 Estas dos funciones responden preguntas distintas sobre un objeto. `mode()` responde **cómo almacena R los datos internamente**, mientras que `class()` responde **cómo se comporta el objeto cuando se le aplican funciones**.
 
 ```r
-x <- factor(c("rojo", "azul", "rojo"))
+region <- factor(c("norte", "sur", "norte"))
 
-mode(x)
+mode(region)
 ## [1] "numeric"
 
-class(x)
+class(region)
 ## [1] "factor"
 ```
 
@@ -871,7 +888,7 @@ Este ejemplo es revelador: un factor se almacena internamente como números ente
 Otro ejemplo:
 
 ```r
-mi_df <- data.frame(a = 1:3, b = c("x", "y", "z"))
+mi_df <- data.frame(ciudad = c("Lima", "Quito"), altitud = c(154, 2850))
 
 mode(mi_df)
 ## [1] "list"
@@ -906,18 +923,18 @@ Para efectos prácticos en un curso introductorio, casi todo lo que se encuentra
 
 ```r
 # print() se comporta distinto según la clase
-x <- 1:5
-print(x)
-## [1] 1 2 3 4 5
+dias <- c(15, 22, 8, 30)
+print(dias)
+## [1] 15 22  8 30
 
-y <- matrix(1:6, nrow = 2)
-print(y)
+temperaturas <- matrix(c(18, 22, 20, 25, 19, 23), nrow = 2)
+print(temperaturas)
 ##      [,1] [,2] [,3]
-## [1,]    1    3    5
-## [2,]    2    4    6
+## [1,]   18   20   19
+## [2,]   22   25   23
 
-# Detrás de escena, R está llamando print.default() para x
-# y print.matrix() para y
+# Detrás de escena, R está llamando print.default() para dias
+# y print.matrix() para temperaturas
 ```
 
 ### Herramientas para inspeccionar objetos
@@ -937,12 +954,12 @@ print(y)
 De todas estas, `str()` es probablemente la más versátil. Ante la duda sobre cualquier objeto, `str()` es el primer recurso.
 
 ```r
-str(encuesta)
-## 'data.frame':	5 obs. of  4 variables:
-##  $ id   : int  1 2 3 4 5
-##  $ sexo : chr  "m" "m" "f" "f" ...
-##  $ edad : num  24 25 42 56 22
-##  $ grupo: chr  "A" "B" "A" "B" ...
+str(cafeteria)
+## 'data.frame':	4 obs. of  4 variables:
+##  $ bebida    : chr  "espresso" "latte" "americano" "mocha"
+##  $ precio    : num  15 25 18 30
+##  $ disponible: logi  TRUE TRUE FALSE TRUE
+##  $ tamaño    : chr  "S" "M" "M" "L"
 ```
 
 ---
@@ -957,7 +974,7 @@ El ejemplo más claro es el tibble:
 
 ```r
 library(tibble)
-tb <- tibble(x = 1:3, y = c("a", "b", "c"))
+tb <- tibble(producto = c("café", "té"), precio = c(25, 18))
 
 class(tb)
 ## [1] "tbl_df"     "tbl"        "data.frame"
@@ -993,15 +1010,15 @@ Verificar si un objeto pertenece a una clase determinada es una operación frecu
 Las funciones de la familia `is.*()` son las más directas:
 
 ```r
-x <- data.frame(a = 1:3)
+mi_tabla <- data.frame(a = 1:3)
 
-is.data.frame(x)
+is.data.frame(mi_tabla)
 ## [1] TRUE
 
-is.matrix(x)
+is.matrix(mi_tabla)
 ## [1] FALSE
 
-is.list(x)
+is.list(mi_tabla)
 ## [1] TRUE
 ```
 
@@ -1034,12 +1051,12 @@ Entender herencia y pertenencia ayuda a resolver confusiones frecuentes:
 - ¿Por qué `is.vector()` devuelve `FALSE` para un factor, aunque un factor parece un vector? Porque un factor tiene atributos adicionales (niveles y clase) que hacen que `is.vector()` —que verifica si el objeto es un vector *puro* sin atributos extra— devuelva `FALSE`. Sin embargo, `is.atomic()` devuelve `TRUE`, porque los datos subyacentes sí son atómicos.
 
 ```r
-f <- factor(c("a", "b", "a"))
+depto <- factor(c("Guatemala", "Sacatepéquez", "Guatemala"))
 
-is.vector(f)
+is.vector(depto)
 ## [1] FALSE
 
-is.atomic(f)
+is.atomic(depto)
 ## [1] TRUE
 ```
 
