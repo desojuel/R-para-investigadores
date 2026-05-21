@@ -597,6 +597,38 @@ str(estaciones)
 
 Los factores son relevantes para análisis estadísticos (ANOVA, regresiones con variables categóricas) y para controlar el orden de las categorías en gráficos. Sin embargo, pueden causar problemas cuando se confunden con caracteres, por lo que es importante saber distinguirlos.
 
+### 6.8. Objetos generados por paquetes y funciones
+
+Los tipos de objetos que se describieron hasta ahora (vectores, matrices, listas, data frames, etc.) son los bloques fundamentales de R. Pero en la práctica, al usar paquetes y funciones especializadas, se generan objetos con clases propias que internamente están construidos sobre esos mismos bloques, generalmente listas.
+
+**Resultados de funciones estadísticas.** Cuando se ejecuta una regresión lineal con `lm()`, una prueba t con `t.test()` o un análisis de varianza con `aov()`, R no devuelve un número ni una tabla: devuelve un objeto con su propia clase. Ese objeto es, internamente, una lista que contiene múltiples piezas de información (coeficientes, residuos, valores p, intervalos de confianza, etc.), y su clase determina cómo lo muestran funciones como `print()`, `summary()` o `plot()`.
+
+```r
+modelo <- lm(dist ~ speed, data = cars)
+class(modelo)
+## [1] "lm"
+
+typeof(modelo)
+## [1] "list"
+```
+
+El objeto `modelo` es de clase `"lm"`, pero su tipo interno es una lista. Lo mismo ocurre con los resultados de `t.test()` (clase `"htest"`), `aov()` (clase `"aov"`) y muchas otras funciones. No es necesario memorizar cada clase; lo importante es saber que estos objetos son listas disfrazadas, y que se puede explorar su contenido con `str()` y acceder a sus componentes con `$` o `[[]]`.
+
+**Gráficos.** En R base, funciones como `plot()`, `hist()` o `boxplot()` generan gráficos como un efecto secundario (dibujan en el dispositivo gráfico), pero algunas también devuelven objetos invisiblemente. Por ejemplo, `hist()` devuelve un objeto de clase `"histogram"` que contiene los puntos de corte, los conteos y las densidades. En el ecosistema de `ggplot2`, los gráficos son explícitamente objetos: se pueden asignar a un nombre, modificar después y combinar.
+
+```r
+library(ggplot2)
+mi_grafico <- ggplot(cars, aes(x = speed, y = dist)) + geom_point()
+class(mi_grafico)
+## [1] "gg"     "ggplot"
+```
+
+El objeto `mi_grafico` no se dibuja hasta que se imprime (escribiendo su nombre o llamando `print()`). Esto permite construir gráficos por partes, guardarlos para después o pasarlos a funciones que los modifiquen.
+
+**Objetos de paquetes especializados.** Algunos paquetes definen sus propias clases para representar estructuras que no encajan cómodamente en los tipos base. Un ejemplo es el paquete `flextable`, que crea objetos de clase `"flextable"` para representar tablas con formato listas para exportar a Word, PowerPoint o HTML. Internamente, un objeto `flextable` es una lista S3 con atributos que describen el contenido, el formato de cada celda, los bordes, las fuentes, etc. Pero desde la perspectiva del usuario, se comporta como una tabla visual que se puede personalizar con funciones propias del paquete.
+
+El punto clave es que el concepto de objeto en R no se limita a vectores y data frames. Todo lo que se genera en R — un modelo, un gráfico, una tabla formateada — es un objeto con una clase, y esa clase determina su comportamiento. La función `str()` sigue siendo la herramienta más confiable para abrir cualquiera de estos objetos y entender qué hay adentro.
+
 ---
 
 ## 7. ¿Cuándo se usa cada tipo de objeto?
@@ -867,47 +899,51 @@ as_tibble(df)
 
 ---
 
-## 10. Inspeccionar objetos: `mode()`, `class()` y el sistema de objetos de R
+## 10. Inspeccionar objetos: `mode()`, `class()`, `typeof()` y el sistema de objetos de R
 
-### `mode()` vs `class()`
+### `mode()`, `class()` y `typeof()`
 
-Estas dos funciones responden preguntas distintas sobre un objeto. `mode()` responde **cómo almacena R los datos internamente**, mientras que `class()` responde **cómo se comporta el objeto cuando se le aplican funciones**.
+Estas tres funciones responden preguntas distintas sobre un objeto. Parecen redundantes, pero cada una opera en un nivel diferente.
+
+`typeof()` es la más técnica. Responde **cómo almacena R los datos a nivel del motor interno (el lenguaje C que está debajo de R)**. Devuelve el tipo de dato tal como lo ve la implementación: `"double"` para números decimales, `"integer"` para enteros, `"character"` para texto, `"logical"` para valores lógicos, `"list"` para listas, `"closure"` para funciones definidas por el usuario, etc.
+
+`mode()` es una versión simplificada de `typeof()`. Agrupa varios tipos internos bajo etiquetas más generales. Por ejemplo, `typeof()` distingue entre `"double"` e `"integer"`, pero `mode()` llama a ambos `"numeric"`. Es una función que viene heredada del lenguaje S y se mantiene por compatibilidad, pero en la práctica es la menos informativa de las tres.
+
+`class()` responde una pregunta completamente diferente: **cómo se comporta el objeto cuando se le aplican funciones**. La clase es lo que determina qué versión de `print()`, `summary()` o `plot()` se usa. Un objeto puede almacenarse internamente como una lista (`typeof()` devuelve `"list"`), pero si su clase es `"data.frame"`, R lo trata como una tabla de datos.
 
 ```r
+# Un vector numérico simple
+x <- c(3.14, 2.72)
+typeof(x)    # "double"   → el motor interno ve números de punto flotante
+mode(x)      # "numeric"  → S simplifica: es numérico
+class(x)     # "numeric"  → se comporta como numérico
+
+# Un factor
 region <- factor(c("norte", "sur", "norte"))
+typeof(region)   # "integer"   → internamente es un vector de enteros
+mode(region)     # "numeric"   → S dice: son números
+class(region)    # "factor"    → pero se comporta como variable categórica
 
-mode(region)
-## [1] "numeric"
+# Un data frame
+df <- data.frame(ciudad = c("Lima", "Quito"), altitud = c(154, 2850))
+typeof(df)   # "list"         → internamente es una lista
+mode(df)     # "list"         → S confirma: es una lista
+class(df)    # "data.frame"   → pero se comporta como tabla de datos
 
-class(region)
-## [1] "factor"
+# Un modelo lineal
+modelo <- lm(dist ~ speed, data = cars)
+typeof(modelo)   # "list"     → internamente es una lista
+mode(modelo)     # "list"     → S confirma: es una lista
+class(modelo)    # "lm"       → pero se comporta como modelo lineal
 ```
 
-Este ejemplo es revelador: un factor se almacena internamente como números enteros (cada nivel es un número), pero su clase es `"factor"`, lo cual determina que funciones como `print()`, `summary()` o `plot()` lo traten como una variable categórica y no como una serie de números.
+El patrón que emerge es claro: `typeof()` y `mode()` miran hacia adentro (cómo se almacenan los datos), mientras que `class()` mira hacia afuera (cómo se comporta el objeto). Para el trabajo cotidiano, `class()` es casi siempre la más relevante, porque determina qué se puede hacer con el objeto. `typeof()` es útil cuando se necesita entender exactamente qué hay debajo (por ejemplo, para entender por qué un cálculo produce un resultado inesperado por precisión numérica). `mode()` rara vez aporta información que las otras dos no den.
 
-Otro ejemplo:
-
-```r
-mi_df <- data.frame(ciudad = c("Lima", "Quito"), altitud = c(154, 2850))
-
-mode(mi_df)
-## [1] "list"
-
-class(mi_df)
-## [1] "data.frame"
-```
-
-Un data frame se almacena como una lista (porque es una colección de vectores), pero su clase es `"data.frame"`, y eso es lo que hace que funciones como `head()`, `summary()` o `subset()` sepan cómo trabajar con él.
-
-En resumen:
-
-| Función | Pregunta que responde | Ejemplo con un factor |
-|---------|----------------------|----------------------|
-| `mode()` | ¿Cómo se almacenan los datos? | `"numeric"` |
-| `class()` | ¿Cómo se comporta el objeto? | `"factor"` |
-| `typeof()` | ¿Cuál es el tipo interno exacto? | `"integer"` |
-
-Para el trabajo cotidiano, `class()` suele ser más informativa que `mode()`, porque indica cómo otras funciones van a interpretar el objeto. `str()` combina ambas perspectivas en una sola salida y sigue siendo la herramienta más completa.
+| Función | Nivel | Pregunta | `factor` | `data.frame` | `lm()` |
+|---------|-------|----------|----------|-------------|--------|
+| `typeof()` | Motor interno (C) | ¿Cómo se almacena en memoria? | `"integer"` | `"list"` | `"list"` |
+| `mode()` | Lenguaje S (simplificado) | ¿Qué tipo general de dato es? | `"numeric"` | `"list"` | `"list"` |
+| `class()` | Comportamiento en R | ¿Cómo se comporta con funciones? | `"factor"` | `"data.frame"` | `"lm"` |
 
 ### R, S y los sistemas de objetos
 
@@ -943,8 +979,8 @@ print(temperaturas)
 |---------|-------------|
 | `str()` | Estructura del objeto: tipo, dimensiones, primeros valores |
 | `class()` | La clase del objeto (`vector`, `matrix`, `data.frame`, etc.) |
-| `mode()` | El modo de almacenamiento (`numeric`, `character`, `logical`, etc.) |
 | `typeof()` | El tipo interno exacto (`integer`, `double`, `character`, etc.) |
+| `mode()` | El modo de almacenamiento heredado de S (`numeric`, `character`, `list`, etc.) |
 | `length()` | Número de elementos |
 | `dim()` | Dimensiones (para matrices, arrays y data frames) |
 | `names()` | Nombres de los elementos o columnas |
