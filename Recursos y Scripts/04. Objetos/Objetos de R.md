@@ -579,7 +579,7 @@ mode(convertir_km)
 ## [1] "function"
 ```
 
-Aunque la creación de funciones se trata en detalle en temas posteriores, es importante saber desde ahora que en R las funciones no son algo separado de los objetos: son un tipo más de objeto.
+Es importante saber desde ahora que en R las funciones no son algo separado de los objetos: son un tipo más de objeto.
 
 ### 6.7. Factores
 
