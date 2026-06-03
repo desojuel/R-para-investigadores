@@ -1,0 +1,11 @@
+carnet|nombre|carrera|sede|ciclo_ingreso
+201990001|Andrea Solís|Psicología|Central|2019
+201990002|Roberto Juárez|Pedagogía|Quetzaltenango|2019
+202090003|Claudia Mejía|Trabajo Social|Central|2020
+202090004|Manuel Estrada|Ciencias de la Comunicación|Escuintla|2020
+202190005|Gabriela Ramos|Psicología|Central|2021
+202190006|Luis Sandoval|Pedagogía|Central|2021
+202290007|Patricia Monzón|Trabajo Social|Quetzaltenango|2022
+202290008|Ricardo Flores|Psicología|Escuintla|2022
+202390009|Diana Pérez|Pedagogía|Central|2023
+202390010|Alejandro Vásquez|Ciencias de la Comunicación|Central|2023

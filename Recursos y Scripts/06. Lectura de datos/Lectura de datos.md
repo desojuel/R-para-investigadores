@@ -45,6 +45,8 @@ Las tres líneas producen el mismo resultado: un data frame (o tibble) con los d
 Cuando los datos están alojados en una hoja de Google Sheets, se puede leer directamente desde R proporcionando la URL del documento. No es necesario descargar el archivo primero:
 
 ```r
+gs4_deauth() 
+
 muestra_erce_2019_gsheets <- read_sheet("https://docs.google.com/spreadsheets/d/1dhxgz1Jol5K__KKvygWqw2fqd0eJ-uYABtsSMy1FpEA/edit?usp=sharing")
 ```
 
@@ -56,13 +58,17 @@ Cuando los datos están publicados en un sitio web (como el portal de DIGEDUCA d
 
 ```r
 temp <- tempfile()
+temp_dir <- tempdir()
 
 download.file("https://edu.mineduc.gob.gt/digeduca/apps/Bases_de_Datos_Evaluaciones/navegador/2025/documents/2025-Grad-Internet.zip",
               temp)
 
-graduandos2025_web <- read_sav(unzip(temp), user_na = T)
+graduandos2025_web <- read_sav(
+  unzip(temp_zip, exdir = temp_dir),
+  user_na = TRUE
+)
 ```
 
-`tempfile()` crea un archivo temporal en el sistema que se elimina automáticamente al cerrar la sesión de R. `download.file()` descarga el `.zip` a esa ubicación temporal. `unzip()` lo descomprime, y `read_sav()` lee el archivo SPSS que estaba dentro del `.zip`. Todo ocurre sin salir de R.
+`tempfile()` reserva una ruta en la carpeta temporal del sistema para almacenar el .zip descargado. `tempdir()` apunta al directorio temporal de la sesión, donde `unzip()` extrae el contenido sin tocar el directorio de trabajo. `read_sav()` lee el archivo SPSS resultante directamente desde esa ubicación. Al cerrar la sesión de R, ambas ubicaciones temporales se eliminan automáticamente.
 
 Los datos de graduandos 2025 utilizados en este ejemplo son datos reales y públicos, disponibles en el sitio de DIGEDUCA: `https://edu.mineduc.gob.gt/digeduca/apps/Bases_de_Datos_Evaluaciones/`

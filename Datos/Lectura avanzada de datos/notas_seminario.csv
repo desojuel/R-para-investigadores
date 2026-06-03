@@ -1,0 +1,15 @@
+Reporte de notas - Seminario de Investigación Educativa
+Universidad de San Carlos de Guatemala - Ciclo 2025
+Generado el 15 de mayo de 2025
+# Los estudiantes marcados con N/A no completaron la evaluación
+carnet,nombre,nota_parcial_1,nota_parcial_2,nota_final,asistencia_pct
+201890001,María López,85,90,88,95
+201890002,Carlos Méndez,72,N/A,.,80
+201890003,Ana Rodríguez,91,88,90,100
+201890004,José García,65,70,68,75
+201890005,Lucía Hernández,N/A,N/A,N/A,40
+201890006,Pedro Ramírez,78,82,80,90
+201890007,Sofía Morales,95,5,93,100
+201890008,Diego Castillo,60,55,,65
+201890009,Valentina Cruz,88,85,87,95
+201890010,Fernando Paz,70,75,73,85
