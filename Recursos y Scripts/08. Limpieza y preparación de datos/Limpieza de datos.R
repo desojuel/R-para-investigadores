@@ -17,11 +17,11 @@ df <- read_csv(here("Datos", "encuesta_cruda.csv")) %>% clean_names()
 df <- df %>% 
   rename(
     establecimiento = nombredelestablecimiento,
-    conocimiento   = x1_conocimiento,
-    capacitacion   = x2_capacitacion,
-    materiales     = x3_materiales,
-    aplicacion     = x4_aplicacion,
-    otras_dificultades = x334_que_otras_dificultades_de_implementacion_identifica_en_el_centro_educativo,
+    respeto        = x1_respeto,
+    participacion  = x2_participacion,
+    conflictos     = x3_conflictos,
+    pertenencia    = x4_pertenencia,
+    otras_dificultades = x334_que_factores_afectan_la_convivencia_en_el_centro_educativo,
     nota           = nota_evaluacion
   )
 
@@ -60,7 +60,10 @@ df <- df %>%
 df %>% count(area) # se empieza con una exploración
 
 # Corregir un error de digitación puntual
+
 df$area[df$area == "Urbanaa"] <- "Urbana"
+df$otras_dificultades[is.na(df$otras_dificultades)] <- "Sin información"
+
 
 # Corregir un NA puntual del que se conoce el valor verdadero
 df$area[df$codigo == "00-11-0099-41"] <- "Rural"
@@ -108,14 +111,14 @@ umbral_no_respuesta <- 0.30   # se modifica aquí si se quiere otro corte
 
 # (A) NOMBRES de columnas: names(df)[ ... ] devuelve un vector de CARACTERES
 vars_preguntas <- names(df)[
-  match("conocimiento", names(df)):match("otras_dificultades", names(df))
+  match("respeto", names(df)):match("otras_dificultades", names(df))
 ]
 
 
 # (B) ÍNDICES de columnas: el c(match:match, ...) devuelve un vector de POSICIONES (enteros)
 
 rango_vars <- c(
-  match("conocimiento", names(df)):match("aplicacion", names(df)),
+  match("respeto", names(df)):match("pertenencia", names(df)),
   match("otras_dificultades", names(df)):match("otras_dificultades", names(df))
 )
 
@@ -210,7 +213,7 @@ niveles_likert <- c("Nada", "Poco", "Algo", "Bastante", "Mucho")
 
 df <- df %>%
   mutate(across(
-    c(conocimiento, capacitacion, materiales, aplicacion),
+    c(respeto, participacion, conflictos, pertenencia),
     ~ factor(.x, levels = niveles_likert)
   ))
 
@@ -245,13 +248,13 @@ df %>% miss_var_summary()   # tabla de faltantes por variable
 gg_miss_var(df)             # gráfico de barras de faltantes por variable
 vis_miss(df)                # mapa visual de toda la matriz de datos
 
-df %>% tabyl(capacitacion) 
+df %>% tabyl(participacion) 
 
 ### transformar explícitamente el `NA` en una categoría con nombre ----
 
 df %>%
-  mutate(capacitacion = replace_na(as.character(capacitacion), "Sin información")) %>%
-  tabyl(capacitacion)
+  mutate(participacion = replace_na(as.character(participacion), "Sin información")) %>%
+  tabyl(participacion)
 
 ## 4.2 Identificar inconsistencias con `validate` ----
 
@@ -272,6 +275,3 @@ violating(df, resultado["nota_en_rango"]) # Para ver exactamente qué registros 
 write_xlsx(df, here("Datos", "Datos limpios", "encuesta_limpia.xlsx"))
 
 write_xlsx(bitacora, here("Datos", "Datos limpios","bitacora de limpieza.xlsx"))
-
-
-
