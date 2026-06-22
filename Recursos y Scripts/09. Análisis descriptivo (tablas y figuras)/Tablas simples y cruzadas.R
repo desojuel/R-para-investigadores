@@ -1,0 +1,112 @@
+pacman::p_load(tidyverse,
+               janitor,
+               writexl,
+               santoku,
+               googlesheets4,
+               scales,
+               crosstable,
+               flextable)
+
+gs4_deauth()
+
+df <- read_sheet("https://docs.google.com/spreadsheets/d/1dhxgz1Jol5K__KKvygWqw2fqd0eJ-uYABtsSMy1FpEA/edit?usp=sharing") %>% 
+  clean_names()
+
+# crear rangos para una variable cuantitativa ----
+
+quantile(df$autorregulacion)
+
+df <- df %>% 
+  mutate(
+    rangos_autorregulacion = chop_quantiles(
+      autorregulacion,
+      probs = c(.25,
+                .50,
+                .75
+      ),
+      left = F,
+      raw = T
+    )
+  )
+
+df <- df %>% 
+  mutate(
+    rangos_autorregulacion = chop_quantiles(
+      autorregulacion,
+      probs = c("10 a 27" = .0,
+                "28 a 31" = .25,
+                "32 a 34" = .50,
+                "35 a 40" = .75
+                ),
+      left = T,
+      raw = T
+    )
+  )
+
+# Tabla simple ----
+
+## con janitor ---- 
+
+tabla_simple_janitor <- df %>% 
+  tabyl(area) %>% 
+  adorn_totals("row") %>% 
+  adorn_pct_formatting(digits = 2) %>% 
+  mutate(f = comma(n)) %>% 
+  select(Área = area, 
+         f, 
+         `%` = percent)
+  
+### pasar a flextable ---- 
+
+flextable(tabla_simple_janitor) %>%
+  bold(part = "header") %>%
+  align(j = 2:3, align = "center", part = "header") %>%
+  align(j = 2:3, align = "right", part = "body") %>%
+  fontsize(size = 9, part = "all") %>%
+  width(j = 1, width = 0.5) %>%
+  width(j = 2:3, width = 0.5)
+
+# Tabla de resumen estadístico ----
+
+tabla_resumen <- df %>% 
+  summarise(
+    Media = round(mean(autorregulacion, na.rm = TRUE), 3),
+    Mediana = round(median(autorregulacion, na.rm = TRUE), 3),
+    `Desviación estándar` = round(sd(autorregulacion, na.rm = TRUE), 3),
+    Mínimo = min(autorregulacion, na.rm = TRUE),
+    Máximo = max(autorregulacion, na.rm = TRUE),
+    Rango = (Máximo - Mínimo)
+  ) |> 
+  pivot_longer(cols = everything(), names_to = "Estadístico", values_to = "Valor")
+
+## flextable
+
+flextable(tabla_resumen) %>%
+  bold(part = "header") %>%
+  align(j = 2, align = "center", part = "header") %>%
+  align(j = 2, align = "right", part = "body") %>%
+  fontsize(size = 9, part = "all") %>%
+  width(j = 1, width = 1.5) %>%
+  width(j = 2, width = 0.5)
+
+# Tabla cruzada ----
+
+tabla_cruzada <- df %>% 
+  rename('Rangos autorregulación' = rangos_autorregulacion) %>% 
+  crosstable('Rangos autorregulación', by = area,
+             total = "row"
+             ) %>% 
+  compact() %>% 
+  rename(Variable = variable)
+
+## pasar a flextable
+
+flextable(tabla_cruzada) %>% 
+  bold(part = "header") %>%
+  
+  
+
+# Tablas simples para datos con variables con delimitadores ----
+
+## flextable
+
