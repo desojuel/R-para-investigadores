@@ -1,4 +1,6 @@
-pacman::p_load(tidyverse,
+pacman::p_load(here,
+               readxl,
+               tidyverse,
                janitor,
                writexl,
                santoku,
@@ -48,6 +50,7 @@ df <- df %>%
 ## con janitor ---- 
 
 tabla_simple_janitor <- df %>% 
+  mutate(area = factor(area, levels = c("Urbana", "Rural"))) %>%
   tabyl(area) %>% 
   adorn_totals("row") %>% 
   adorn_pct_formatting(digits = 2) %>% 
@@ -91,22 +94,50 @@ flextable(tabla_resumen) %>%
 
 # Tabla cruzada ----
 
-tabla_cruzada <- df %>% 
-  rename('Rangos autorregulación' = rangos_autorregulacion) %>% 
-  crosstable('Rangos autorregulación', by = area,
-             total = "row"
-             ) %>% 
-  compact() %>% 
-  rename(Variable = variable)
 
+tabla_cruzada <- df %>% 
+  rename("Área" = area) %>% 
+  crosstable(
+    rangos_autorregulacion,
+    by = "Área",
+    total = "both"
+  ) %>% 
+rename(`Rangos autorregulación` = variable)  %>% select(-c(.id,label))
+  
+  
 ## pasar a flextable
 
-flextable(tabla_cruzada) %>% 
-  bold(part = "header") %>%
-  
-  
+flextable(tabla_cruzada) |>
+  add_header_row(values = c("Rangos autorregulación", "Área", "Total"),
+                 colwidths = c(1, 2, 1)) |>
+  merge_v(part = "header") |>
+  align(j = 2:4, align = "center", part = "header") |>
+  align(j = 2:4, align = "right", part = "body") |>
+  bold(part = "header") |>
+  fontsize(size = 9, part = "all") |>
+  autofit()
 
 # Tablas simples para datos con variables con delimitadores ----
+    
+df_delim <- read_excel(here("Datos", "Datos limpios", "encuesta_limpia.xlsx")) %>% 
+  clean_names()
+
+tabla_simple_delim <- df_delim |> 
+  select(otras_dificultades) |> 
+  separate_longer_delim(otras_dificultades, delim = "; ") |> 
+  dplyr::count("Otras dificultades" = otras_dificultades, sort = F, name = "f") |>
+  dplyr::mutate(`%` = scales::percent(f/nrow(df_delim), accuracy = 0.01)) |>
+  dplyr::arrange(desc(f)) 
 
 ## flextable
+
+flextable(tabla_simple_delim) %>%
+  bold(part = "header") %>%
+  align(j = 2:3, align = "center", part = "header") %>%
+  align(j = 2:3, align = "right", part = "body") %>%
+  fontsize(size = 9, part = "all") %>%
+  width(j = 1, width = 1.5) %>%
+  width(j = 2:3, width = 0.5)
+
+
 
