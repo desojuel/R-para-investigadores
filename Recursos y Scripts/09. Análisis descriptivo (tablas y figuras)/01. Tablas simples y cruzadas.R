@@ -139,5 +139,27 @@ flextable(tabla_simple_delim) %>%
   width(j = 1, width = 1.5) %>%
   width(j = 2:3, width = 0.5)
 
+# exportar
 
+write_xlsx(tabla_simple_delim, here("Datos","Exportar tablas","tabla_simple_delim.xlsx"))
 
+write_xlsx(tabla_simple_janitor, here("Datos","Exportar tablas","tabla_simple_janitor.xlsx"))
+
+## tablas en una misma hoja
+
+tablas <- list(
+  tabla_simple_delim   = tabla_simple_delim,
+  tabla_simple_janitor = tabla_simple_janitor
+)
+
+write_xlsx(tablas, here("Datos", "Exportar tablas", "tablas_unidas.xlsx"))
+
+## talbas renombradas en una misma hoja
+
+write_xlsx(
+  list(
+    "Simple delim"   = tabla_simple_delim,
+    "Simple janitor" = tabla_simple_janitor
+  ),
+  here("Datos", "Exportar tablas", "tablas_renombradas.xlsx")
+)
