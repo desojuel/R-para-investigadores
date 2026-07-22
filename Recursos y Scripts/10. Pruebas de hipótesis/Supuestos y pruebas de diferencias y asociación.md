@@ -106,6 +106,9 @@ pacman::p_load(
   effectsize,   # tamaños de efecto (eta cuadrado, d de Cohen)
   car,          # leveneTest()
   nortest,      # pruebas de normalidad alternativas
+  coin,         # pruebas de permutación y puntajes ordinales explícitos
+  DescTools,    # pruebas de tendencia y medidas de asociación ordinal
+  effsize,      # delta de Cliff
   survey,       # análisis con diseño muestral complejo
   srvyr,        # interfaz tidyverse para survey
   report,       # reporte automático en formato APA
@@ -194,59 +197,237 @@ Significa que no se supone una distribución concreta. Estas pruebas conservan e
 para poder interpretarse en términos de medianas, requieren que las distribuciones de los grupos tengan formas
 comparables. Cambiar de familia no elimina supuestos: los sustituye por otros.
 
-### 4.2 El problema del nivel de medición en educación y psicología
+### 4.2 El nivel de medición: qué se está afirmando cuando el dato es ordinal
 
-Este punto merece un tratamiento explícito, porque en investigación educativa y psicológica es la situación
-habitual y no la excepción.
+Este apartado merece un tratamiento detenido, porque en investigación educativa y psicológica la situación
+que describe es la norma y no la excepción, y porque la decisión que implica suele tomarse sin advertirlo.
 
 La taxonomía clásica distingue variables **nominales** (categorías sin orden), **ordinales** (categorías
-ordenadas, pero sin distancias iguales entre ellas), **de intervalo** (distancias iguales, cero arbitrario) y
-**de razón** (distancias iguales y cero absoluto). La regla tradicional dice que la media requiere al menos
-nivel de intervalo, porque promediar supone que la distancia entre 1 y 2 es la misma que entre 4 y 5.
+ordenadas, pero sin garantía de que las distancias entre ellas sean iguales), **de intervalo** (distancias
+iguales, cero arbitrario) y **de razón** (distancias iguales y cero absoluto). La regla tradicional dice que
+calcular una media exige al menos nivel de intervalo, porque promediar supone que la distancia entre 1 y 2 es
+la misma que entre 4 y 5.
 
-El problema es que la mayoría de los instrumentos de estas disciplinas producen datos que caen en una **zona
-gris**. Un ítem tipo Likert ("Nada, Poco, Algo, Bastante, Mucho") es estrictamente ordinal: nada garantiza que
-el salto de "Nada" a "Poco" equivalga al de "Bastante" a "Mucho". Sin embargo, en la práctica se suman los
-ítems, se calcula la media, se aplica una prueba t y con frecuencia se termina tratando el resultado como si
-fuera de razón.
+El problema es que la mayoría de los instrumentos de estas disciplinas produce datos ordinales que en la
+práctica se tratan como continuos. Un ítem tipo Likert ("Nada, Poco, Algo, Bastante, Mucho") se codifica de 1
+a 5, se promedia, se le aplica una prueba t y se termina interpretando el resultado como si los números
+midieran cantidades reales.
 
-Qué cambia realmente en el contexto de decisión:
+#### Qué se está afirmando exactamente al tomar el camino común
 
-**El riesgo principal no es el valor p, sino la interpretación.** Numerosos estudios de simulación muestran que
-las pruebas paramétricas aplicadas a puntajes ordinales conservan bastante bien su tasa de error, sobre todo
-cuando se trata de **puntajes de escala** (la suma o el promedio de muchos ítems), que se aproximan a una
-variable continua. Lo que no se sostiene es afirmar que "el grupo A superó al grupo B en 0.4 puntos" como si
-esos 0.4 puntos tuvieran un significado métrico constante a lo largo de la escala.
+Recurrir a la media (y por tanto a la t o al ANOVA) con una variable ordinal no es un descuido menor ni un
+tecnicismo: **es afirmar que los números asignados a las categorías representan distancias reales**. Ese
+supuesto suele quedar implícito, pero es posible hacerlo visible, y conviene verlo con datos.
+
+La variable `lectura_horas` registra el tiempo dedicado a leer en cinco categorías ordenadas, codificadas de
+0 a 4. Esos códigos son etiquetas de orden, no mediciones de tiempo. Supóngase que las categorías
+correspondieran aproximadamente a 0 horas, media hora, hora y media, tres horas y seis horas. Es una
+recodificación que **conserva exactamente el mismo orden** y solo cambia las distancias entre categorías:
+
+```r
+sub <- datos %>% filter(!is.na(lectura_horas))
+
+# Codificación A: los códigos originales (0, 1, 2, 3, 4)
+t.test(lectura_horas ~ area, data = sub)
+#>  diferencia de medias = 0.0575
+#>  t = 1.137, p-value = 0.2559
+
+# Codificación B: mismo orden, distancias distintas (0, 0.5, 1.5, 3, 6)
+sub <- sub %>%
+  mutate(horas_aprox = case_match(lectura_horas,
+    0 ~ 0, 1 ~ 0.5, 2 ~ 1.5, 3 ~ 3, 4 ~ 6))
+
+t.test(horas_aprox ~ area, data = sub)
+#>  diferencia de medias = 0.0947
+#>  t = 1.036, p-value = 0.3005
+```
+
+La diferencia entre áreas pasó de 0.0575 a 0.0947 (casi el doble) y el valor p cambió de .256 a .301,
+**sin que ningún dato cambiara**: las mismas personas contestaron exactamente lo mismo. Lo único que cambió
+fue una decisión arbitraria sobre cuánto vale cada categoría.
+
+Ahora la comparación decisiva. La prueba basada en rangos con las dos codificaciones:
+
+```r
+wilcox.test(lectura_horas ~ area, data = sub)
+#>  W = 935314, p-value = 0.1836
+
+wilcox.test(horas_aprox ~ area, data = sub)
+#>  W = 935314, p-value = 0.1836     <- exactamente el mismo resultado
+```
+
+El resultado es **idéntico hasta el último decimal**. La razón es que las pruebas de rangos solo usan el
+orden, y el orden no cambió. Son invariantes ante cualquier recodificación que respete la secuencia de las
+categorías.
+
+De ahí la conclusión que conviene fijar: **cuando se aplica una prueba basada en medias a una variable
+ordinal, el resultado depende de una codificación que el investigador eligió y que rara vez justifica**. La
+prueba no puede saber si los intervalos son reales; simplemente los toma por ciertos. Tomar el camino común
+es legítimo, pero implica sostener esa afirmación, y conviene saber que se está sosteniendo.
+
+#### Qué sobrevive y qué no
+
+Precisado el problema, conviene ser igual de preciso sobre su alcance, porque tampoco se trata de prohibir la
+vía paramétrica.
+
+**El valor p resiste razonablemente bien.** Numerosos estudios de simulación muestran que las pruebas
+paramétricas aplicadas a puntajes ordinales conservan bastante bien su tasa de error, sobre todo con puntajes
+de escala. En el ejemplo anterior, las dos codificaciones dieron valores p distintos (.256 y .301), pero la
+**decisión** fue la misma en ambos casos: no significativo. Esa es la situación habitual.
+
+**Lo que no sobrevive es la interpretación métrica.** Afirmar que "el grupo A superó al grupo B en 0.4
+puntos" presupone que esos 0.4 puntos significan lo mismo en cualquier tramo de la escala, y eso es
+exactamente lo que el dato ordinal no garantiza. El riesgo principal no está en concluir de más sobre la
+existencia del efecto, sino en describir su magnitud como si tuviera unidades reales.
 
 **La distinción entre ítem y escala es decisiva.** Un **ítem individual** con cuatro o cinco categorías es
-claramente ordinal: su media es difícil de interpretar y la vía no paramétrica (o un modelo ordinal) es más
-defendible. Un **puntaje de escala** construido con quince o veinte ítems tiene muchos valores posibles, su
-distribución se aproxima a la continua y el tratamiento paramétrico es ampliamente aceptado.
+inequívocamente ordinal: su media es difícil de interpretar y las alternativas ordinales son más defendibles.
+Un **puntaje de escala** construido sumando quince o veinte ítems toma muchos valores distintos, su
+distribución se aproxima a la continua y el tratamiento paramétrico es ampliamente aceptado. La regla
+práctica: cuantos más valores distintos tome la variable, menos problemático resulta el camino común.
 
-**Las pruebas de rangos tampoco son neutrales aquí.** Con pocas categorías se producen muchísimos **empates**
-(observaciones con el mismo valor), y las pruebas basadas en rangos requieren correcciones para manejarlos, lo
-que reduce su potencia. En estos datos, por ejemplo, la variable `desempeño_mate` tiene cuatro niveles para
-3,257 casos: hay miles de empates. Recurrir a Mann-Whitney no resuelve el problema del nivel de medición, solo
-lo desplaza.
+**Las pruebas de rangos tampoco son una salida neutral.** Con pocas categorías se producen enormes cantidades
+de **empates** (observaciones con el mismo valor), y las pruebas de rangos necesitan correcciones para
+manejarlos, lo que reduce su potencia y vuelve aproximados sus valores p. En estos datos, `lectura_horas`
+distribuye 3,257 casos en apenas cinco valores:
 
-**La alternativa de fondo son los modelos ordinales.** Cuando la naturaleza ordinal es central para la
-pregunta, existen modelos que la tratan explícitamente, sin forzar ni la media ni los rangos: los modelos de
-regresión ordinal (`ordinal::clm()`, `MASS::polr()`) modelan la probabilidad de caer en cada categoría o por
-debajo de ella. Son la respuesta más honesta cuando la variable es un ítem ordinal con pocas categorías.
+```r
+datos %>% tabyl(lectura_horas)
+#>  lectura_horas    n
+#>              0    7
+#>              1 2158
+#>              2  347
+#>              3   76
+#>              4  669
+```
 
-**Guía práctica.** Explicitar siempre qué se está suponiendo sobre el nivel de medición; preferir el
-tratamiento paramétrico para puntajes de escala con muchos valores; preferir modelos ordinales o pruebas de
-rangos para ítems individuales con pocas categorías; y, ante la duda, **ejecutar ambas vías y verificar si la
-conclusión cambia**. Si coinciden, el debate sobre el nivel de medición no altera lo que se puede afirmar.
+Con 2,158 personas compartiendo el mismo valor, la noción de "rango" pierde buena parte de su sentido.
+Recurrir a Mann-Whitney no resuelve el problema del nivel de medición: lo desplaza.
+
+#### Alternativas disponibles
+
+Entre "tratar el ordinal como continuo" y "pasar a rangos" hay un espacio de opciones que conviene conocer.
+
+**Hacer explícita la codificación con `coin`.** El paquete **coin** implementa pruebas de permutación bajo un
+marco común, y ofrece una ventaja conceptual para este problema: permite **declarar de forma explícita los
+puntajes asignados a cada categoría ordinal**, en lugar de heredarlos en silencio de la codificación del
+archivo. Lo que antes era un supuesto oculto se convierte en una decisión visible y discutible.
+
+```r
+pacman::p_load(coin)
+
+# Prueba de rangos con distribución exacta o aproximada por permutación
+coin::wilcox_test(lectura_horas ~ area, data = sub,
+                  distribution = "approximate")
+
+# Declarando explícitamente los puntajes de cada categoría ordinal
+coin::independence_test(
+  lectura_horas ~ area, data = sub,
+  scores = list(lectura_horas = c(0, 0.5, 1.5, 3, 6))
+)
+```
+
+`coin` resulta especialmente útil con muestras pequeñas o con muchos empates (justo el escenario de los ítems
+Likert), porque sus valores p exactos o por permutación no dependen de aproximaciones que esas condiciones
+deterioran. Sus funciones cubren los equivalentes de casi todas las pruebas de la lección
+(`coin::wilcox_test()`, `coin::kruskal_test()`, `coin::sign_test()`, `coin::independence_test()`).
+
+**Pruebas que aprovechan el orden de los grupos.** Kruskal-Wallis y chi-cuadrado tratan las categorías como
+si no tuvieran orden: detectan "alguna diferencia" en cualquier dirección. Cuando los grupos **están
+ordenados**, existen pruebas que usan esa información y resultan más potentes porque concentran la evidencia
+en una sola hipótesis de tendencia.
+
+La variable `fm_grado_alcanzo_mama_reco` (grado de escolaridad alcanzado por la madre, de 1 a 4) es un buen
+ejemplo, y el desempeño en matemática aumenta de forma monotónica a lo largo de sus niveles (medias de 0.13,
+0.21, 0.41 y 0.58):
+
+```r
+# Kruskal-Wallis: detecta diferencias, pero ignora que los niveles están ordenados
+kruskal.test(measure_mate ~ factor(fm_grado_alcanzo_mama_reco), data = datos)
+#>  Kruskal-Wallis chi-squared = 94.51, df = 3, p-value = 2.4e-20
+
+# Jonckheere-Terpstra: contrasta específicamente una TENDENCIA monotónica
+DescTools::JonckheereTerpstraTest(measure_mate ~ factor(fm_grado_alcanzo_mama_reco),
+                                  data = datos)
+#>  JT = 1507652, z = 9.34, p-value < 2.2e-16
+```
+
+Ambas resultan significativas, pero afirman cosas distintas: Kruskal-Wallis dice que al menos un nivel
+difiere de otro; Jonckheere-Terpstra dice que el desempeño **aumenta conforme sube** la escolaridad materna,
+que es una conclusión más específica y más informativa.
+
+Lo mismo ocurre con proporciones. La prueba de **Cochran-Armitage** contrasta si una proporción cambia de
+forma sistemática a lo largo de una variable ordinal:
+
+```r
+tabla_t <- table(datos$fm_grado_alcanzo_mama_reco, datos$logro_mate)
+# porcentaje con logro por nivel: 10.9 %, 12.2 %, 18.7 %, 27.3 %
+
+chisq.test(tabla_t)
+#>  X-squared = 70.43, df = 3, p-value = 3.4e-15    (ignora el orden)
+
+prop.trend.test(tabla_t[, "Sí"], rowSums(tabla_t))
+#>  Chi-squared Test for Trend in Proportions
+#>  X-squared = 64.3, df = 1, p-value = 1.1e-15     (contrasta la tendencia)
+```
+
+Cochran-Armitage alcanza un valor p menor con un solo grado de libertad en lugar de tres: al no gastar
+capacidad de prueba en patrones que no interesan, gana potencia. Cuando ambas variables de una tabla son
+ordinales, la prueba análoga es `coin::lbl_test()` (asociación lineal por lineal).
+
+**Una alternativa a Mann-Whitney cuando las formas difieren.** La lección señaló que Mann-Whitney solo se
+interpreta en términos de medianas si las distribuciones tienen formas comparables. Cuando no las tienen, la
+prueba de **Brunner-Munzel** (`lawstat::brunner.munzel.test()`) no exige ese supuesto y estima directamente
+la probabilidad de que una observación tomada al azar de un grupo supere a una del otro, que además es una
+cantidad fácil de comunicar.
+
+**Tamaños de efecto apropiados.** La d de Cohen presupone la misma métrica que se está cuestionando. Para
+datos ordinales existen medidas coherentes con el orden:
+
+| Medida                        | Función en R                      | Para qué sirve                                   |
+|-------------------------------|-----------------------------------|--------------------------------------------------|
+| Delta de Cliff                | `effsize::cliff.delta()`          | Dominancia entre dos grupos (complemento de Mann-Whitney) |
+| Tau-b de Kendall              | `DescTools::KendallTauB()`        | Asociación entre dos variables ordinales         |
+| Gamma de Goodman-Kruskal      | `DescTools::GoodmanKruskalGamma()`| Asociación ordinal, tolerante a muchos empates   |
+| D de Somers                   | `DescTools::SomersDelta()`        | Asociación ordinal asimétrica (predictor a resultado) |
+
+```r
+effsize::cliff.delta(measure_mate ~ area, data = datos)
+#>  delta estimate: 0.064 (negligible)
+```
+
+**Modelos ordinales.** Cuando la naturaleza ordinal es central para la pregunta, la respuesta de fondo son
+los modelos que la tratan explícitamente, sin forzar ni la media ni los rangos: los modelos de enlace
+acumulativo (`ordinal::clm()` y su versión con efectos aleatorios `ordinal::clmm()`) modelan la probabilidad
+de caer en cada categoría o por debajo de ella. Como ya son modelado y no contraste de grupos, se desarrollan
+en la lección de correlación y regresión.
+
+#### Guía práctica
+
+- **Explicitar siempre el supuesto.** Si se usa la media de una variable ordinal, señalarlo en el reporte y
+  justificar la codificación empleada.
+- **Distinguir ítem de escala.** Para puntajes de escala con muchos valores, el tratamiento paramétrico es
+  defendible; para ítems individuales con pocas categorías, conviene la vía ordinal.
+- **Aprovechar el orden cuando existe.** Si los grupos o las categorías están ordenados, las pruebas de
+  tendencia son más potentes y responden una pregunta más precisa.
+- **Verificar la robustez.** Ejecutar la vía paramétrica y la ordinal y comprobar si la conclusión cambia. Si
+  coinciden, el debate sobre el nivel de medición no altera lo que puede afirmarse; si difieren, ahí hay algo
+  que explicar y no que ocultar.
+- **Cuidar el lenguaje del reporte.** Con datos ordinales conviene describir los resultados en términos de
+  posiciones, proporciones o tendencias, evitando afirmaciones sobre cantidades exactas de puntos.
 
 ### 4.3 Esquema de decisión
 
-| ¿Qué se compara?                           | Vía paramétrica                     | Vía no paramétrica          |
-|--------------------------------------------|-------------------------------------|------------------------------|
-| Dos grupos independientes                  | t de Welch (o t de Student clásica) | U de Mann-Whitney            |
-| Dos medidas del mismo grupo (pareadas)     | t de Student pareada                | Wilcoxon (rangos con signo)  |
-| Tres o más grupos                          | ANOVA (o ANOVA de Welch)            | Kruskal-Wallis               |
-| Asociación entre dos variables categóricas | (no aplica)                         | Chi-cuadrado / Fisher exacta |
+| ¿Qué se compara?                           | Vía paramétrica                     | Vía no paramétrica          | Si además hay orden          |
+|--------------------------------------------|-------------------------------------|------------------------------|------------------------------|
+| Dos grupos independientes                  | t de Welch (o t de Student clásica) | U de Mann-Whitney            | Brunner-Munzel               |
+| Dos medidas del mismo grupo (pareadas)     | t de Student pareada                | Wilcoxon (rangos con signo) o prueba de signos | (según el caso) |
+| Tres o más grupos independientes           | ANOVA (o ANOVA de Welch)            | Kruskal-Wallis               | Jonckheere-Terpstra          |
+| Tres o más medidas del mismo grupo         | ANOVA de medidas repetidas          | Friedman                     | (según el caso)              |
+| Asociación entre dos variables categóricas | (no aplica)                         | Chi-cuadrado / Fisher exacta | Cochran-Armitage, lineal por lineal |
+
+La última columna recoge las pruebas del apartado 4.2: son aplicables cuando los grupos o las categorías
+tienen un orden natural, y en esos casos resultan preferibles por ser más potentes y más específicas.
 
 ---
 
@@ -971,6 +1152,28 @@ wilcox.test(vocab$vocab_post, vocab$vocab_pre, paired = TRUE, conf.int = TRUE)
 
 Aquí las dos pruebas coinciden por completo, lo que era esperable: las diferencias son simétricas y no hay
 valores extremos que las separen.
+
+> **Un supuesto de Wilcoxon que suele pasarse por alto.** Se presenta esta prueba como si no exigiera nada,
+> pero sí exige algo: para interpretarse como un contraste sobre la mediana de las diferencias, **las
+> diferencias deben distribuirse de forma simétrica** alrededor de ese valor. No es un supuesto trivial. En
+> estos datos se cumple con holgura (la asimetría de las diferencias es 0.01), pero cuando el cambio es
+> marcadamente asimétrico (por ejemplo, si la mayoría no cambia y unos pocos mejoran muchísimo), la
+> alternativa es la **prueba de signos**, que solo cuenta cuántos casos subieron y cuántos bajaron, sin
+> suponer nada sobre la forma:
+>
+> ```r
+> vocab %>% sign_test(vocab_post ~ vocab_pre)
+>
+> # versión exacta o por permutación
+> coin::sign_test(vocab_post ~ vocab_pre, data = vocab, distribution = "exact")
+> ```
+>
+> Es menos potente que Wilcoxon (descarta la magnitud del cambio y conserva solo su dirección), pero es la
+> opción más segura cuando la simetría no se sostiene y la que exige menos del nivel de medición.
+
+> **Tres o más medidas del mismo grupo.** Si el diseño incluyera un tercer momento (por ejemplo, una medición
+> de seguimiento), la extensión no paramétrica es la prueba de **Friedman**
+> (`friedman.test()`), con comparaciones post hoc mediante `PMCMRplus::frdAllPairsNemenyiTest()`.
 
 > Cuando la variable pareada es **categórica** (por ejemplo, si el estudiante alcanzó o no el criterio antes y
 > después), la prueba adecuada es la de **McNemar** (`mcnemar.test()`), que examina si los cambios en un
